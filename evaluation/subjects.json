@@ -1,0 +1,242 @@
+[
+  [
+    "Acoustics",
+    "Sound travels through air as a longitudinal pressure wave.",
+    "What kind of wave carries sound through air?",
+    "a longitudinal pressure wave"
+  ],
+  [
+    "Spectroscopy",
+    "An emission line appears when an atom releases a photon during a transition to a lower energy level.",
+    "When does an atom produce an emission line?",
+    "a transition to a lower energy level"
+  ],
+  [
+    "Orbital motion",
+    "A satellite in a circular orbit accelerates toward the center of its orbit.",
+    "Where does the acceleration point?",
+    "toward the center"
+  ],
+  [
+    "Optics",
+    "A concave lens makes parallel rays diverge after passing through the lens.",
+    "What happens to parallel rays in a concave lens?",
+    "diverge"
+  ],
+  [
+    "Thermodynamics",
+    "An insulated container limits the transfer of heat between the contents and their surroundings.",
+    "What transfer does insulation limit?",
+    "the transfer of heat"
+  ],
+  [
+    "Circuits",
+    "In a series circuit, the same current passes through each component.",
+    "Which quantity is the same in each series component?",
+    "the same current"
+  ],
+  [
+    "Magnetism",
+    "A compass needle aligns with the local magnetic field.",
+    "What field does a compass needle align with?",
+    "local magnetic field"
+  ],
+  [
+    "Waves",
+    "For a fixed wave speed, increasing frequency shortens the wavelength.",
+    "What happens to wavelength when frequency rises at fixed speed?",
+    "shortens the wavelength"
+  ],
+  [
+    "Mechanics",
+    "A net force changes an object's momentum. A larger impulse produces a larger change in momentum.",
+    "What does a larger impulse produce?",
+    "a larger change in momentum"
+  ],
+  [
+    "Measurement",
+    "Repeated measurements can reveal random variation, while a consistent offset suggests systematic error.",
+    "What does a consistent offset suggest?",
+    "systematic error"
+  ],
+  [
+    "Geology",
+    "Sedimentary layers can preserve a sequence of deposition. In an undisturbed sequence the oldest layer lies at the bottom.",
+    "Where is the oldest undisturbed layer?",
+    "at the bottom"
+  ],
+  [
+    "Mineralogy",
+    "A mineral's streak is the color of its powdered form on an unglazed plate.",
+    "What property does a streak test reveal?",
+    "the color of its powdered form"
+  ],
+  [
+    "Hydrology",
+    "An aquifer stores groundwater in permeable rock or sediment.",
+    "Where does an aquifer store groundwater?",
+    "permeable rock or sediment"
+  ],
+  [
+    "Coastal processes",
+    "A longshore current moves water parallel to the shoreline.",
+    "Which direction does a longshore current flow?",
+    "parallel to the shoreline"
+  ],
+  [
+    "Clouds",
+    "Water vapor condenses into droplets when moist air cools sufficiently.",
+    "How do droplets form in cooling moist air?",
+    "Water vapor condenses"
+  ],
+  [
+    "Rivers",
+    "A river deposits sediment when its ability to transport particles decreases.",
+    "When does a river deposit sediment?",
+    "ability to transport particles decreases"
+  ],
+  [
+    "Climate records",
+    "Tree rings can record changes in growing conditions across successive years.",
+    "What can successive tree rings record?",
+    "changes in growing conditions"
+  ],
+  [
+    "Cartography",
+    "Contour lines connect points of equal elevation on a map.",
+    "What do contour lines connect?",
+    "points of equal elevation"
+  ],
+  [
+    "Soils",
+    "Humus is decomposed organic matter that contributes to the soil's ability to retain water.",
+    "What does humus help soil retain?",
+    "retain water"
+  ],
+  [
+    "Astronomy",
+    "The apparent daily motion of stars across the sky results from the rotation of Earth.",
+    "What causes the apparent daily motion of stars?",
+    "rotation of Earth"
+  ],
+  [
+    "Statistics",
+    "The median is the middle value of an ordered list when the number of entries is odd.",
+    "For an odd-sized list, what is its median?",
+    "the middle value"
+  ],
+  [
+    "Probability",
+    "Two events are independent when learning the outcome of one does not change the probability of the other.",
+    "When are events independent?",
+    "does not change the probability"
+  ],
+  [
+    "Experimental design",
+    "Random assignment helps balance potential confounders across treatment groups.",
+    "What does random assignment help balance?",
+    "potential confounders"
+  ],
+  [
+    "Geometry",
+    "A triangle's centroid is the point where its three medians intersect.",
+    "Where is the centroid of a triangle?",
+    "three medians intersect"
+  ],
+  [
+    "Algebra",
+    "The slope of a line measures the change in vertical coordinate per unit change in horizontal coordinate.",
+    "What does slope measure?",
+    "change in vertical coordinate"
+  ],
+  [
+    "Graph theory",
+    "An undirected graph has edges that can be traversed in either direction.",
+    "How can an undirected edge be traversed?",
+    "in either direction"
+  ],
+  [
+    "Algorithms",
+    "A binary search repeatedly halves the remaining interval in an ordered collection.",
+    "How does binary search narrow its interval?",
+    "halves the remaining interval"
+  ],
+  [
+    "Data structures",
+    "A queue removes elements in the order they were added, commonly called first in, first out.",
+    "In what order are items removed from a queue?",
+    "the order they were added"
+  ],
+  [
+    "Information design",
+    "A sequential color scale represents ordered values with a progression from light to dark.",
+    "Which values fit a sequential color scale?",
+    "ordered values"
+  ],
+  [
+    "Economics",
+    "Opportunity cost is the value of the best alternative given up when choosing an option.",
+    "What does opportunity cost measure?",
+    "the best alternative given up"
+  ],
+  [
+    "Music",
+    "A rest indicates a period of silence in written music.",
+    "What does a rest indicate?",
+    "a period of silence"
+  ],
+  [
+    "Printmaking",
+    "In relief printing, raised parts of a prepared surface receive ink and transfer the image.",
+    "Which parts receive ink in relief printing?",
+    "raised parts"
+  ],
+  [
+    "Ceramics",
+    "A kiln heats clay objects to change them into durable ceramic material.",
+    "What does a kiln do to clay objects?",
+    "heats clay objects"
+  ],
+  [
+    "Painting",
+    "A glaze is a thin translucent layer of paint applied over an existing layer.",
+    "What distinguishes a glaze?",
+    "thin translucent layer"
+  ],
+  [
+    "Literature",
+    "An unreliable narrator presents an account whose accuracy or interpretation the reader has reason to question.",
+    "What can a reader question about an unreliable narrator?",
+    "accuracy or interpretation"
+  ],
+  [
+    "Linguistics",
+    "A phoneme is a sound unit that can distinguish meaning in a language.",
+    "What can a phoneme distinguish?",
+    "distinguish meaning"
+  ],
+  [
+    "Archives",
+    "Provenance records the origin and custody of an archival item.",
+    "What does archival provenance record?",
+    "origin and custody"
+  ],
+  [
+    "History",
+    "A primary source comes from the period or event under study and can include letters, photographs or official records.",
+    "What makes a source primary here?",
+    "from the period or event under study"
+  ],
+  [
+    "Design research",
+    "A usability study observes people attempting representative tasks with a product.",
+    "What does a usability study observe?",
+    "people attempting representative tasks"
+  ],
+  [
+    "Learning science",
+    "Retrieval practice asks a learner to recall information from memory before checking the answer.",
+    "What comes before checking the answer in retrieval practice?",
+    "recall information from memory"
+  ]
+]

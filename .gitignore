@@ -7,3 +7,5 @@ test-results/
 *.log
 supabase/.temp/
 playwright-report/
+*.tsbuildinfo
+next-env.d.ts
