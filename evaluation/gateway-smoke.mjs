@@ -2,7 +2,8 @@ import { getVercelOidcToken } from "@vercel/oidc";
 import { validate } from "../lib/core.mjs";
 import { documents } from "./fixtures.mjs";
 // Run explicitly in a trusted release environment. All inputs are synthetic.
-const model = process.env.RECALLIO_MODEL || "openai/gpt-4.1-mini";
+const model =
+  process.argv[2] || process.env.RECALLIO_MODEL || "openai/gpt-4.1-mini";
 const key =
   process.env.AI_GATEWAY_API_KEY ||
   (await getVercelOidcToken().catch(() => null));
@@ -47,12 +48,27 @@ if (!key) {
       },
     );
     if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      const description = String(payload.error?.message || "").toLowerCase();
+      const reason = [
+        "free tier",
+        "credits",
+        "billing",
+        "payment",
+        "enable",
+        "permission",
+        "authentication",
+        "region",
+        "entitlement",
+        "forbidden",
+      ].filter((word) => description.includes(word));
       console.log(
         "RECALLIO_GATEWAY_SMOKE " +
           JSON.stringify({
             model,
             status: "provider-rejected",
             http: response.status,
+            reason,
           }),
       );
     } else {
