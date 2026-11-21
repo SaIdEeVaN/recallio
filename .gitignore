@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.vercel/
+test-results/
+*.log
+supabase/.temp/
+playwright-report/
