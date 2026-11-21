@@ -9,9 +9,10 @@
     "start": "next start",
     "lint": "eslint .",
     "e2e": "playwright test",
-    "format:check": "prettier --check app components lib tests",
+    "format:check": "prettier --check app components lib tests evaluation",
     "typecheck": "tsc --noEmit",
-    "test:private": "node tests/private-integration.mjs"
+    "test:private": "node tests/private-integration.mjs",
+    "eval": "node evaluation/run.mjs"
   },
   "type": "module",
   "dependencies": {

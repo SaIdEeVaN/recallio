@@ -12,7 +12,11 @@
 
 ## Model evaluation
 
-The synthetic corpus contains 40 study documents and 120 proposed review prompts. It includes unsupported questions, contradictory annotations and embedded instructions. Automated fixture checks verify that expected supporting phrases exist in the source. These checks measure the test data. Model quality still requires actual model responses and independent human review.
+Run the benchmark without credentials using `npm run eval`. It checks 120 tutor cases across 40 synthetic study documents plus eight five-question quizzes. It exercises the app's production prompt builder, tutor stream parser, citation validation, quiz answer redaction and grader. The fixture run recorded 128 passes, including 45 expected abstentions. GitHub Actions runs this check on every push to `main`.
+
+Gateway mode sends the same synthetic inputs and production prompts to the configured model. Run `npm run eval -- --gateway --documents 5` to start with 15 tutor cases and one quiz. Increase the document count to 40 for the complete corpus. Each tutor case makes one request and each quiz allows one retry, so the full run makes at most 136 requests. It stops early on authentication, credits, permission or rate-limit errors. Gateway mode uses `AI_GATEWAY_API_KEY` or Vercel workload credentials and can consume credits.
+
+To save the per-case results with cited text, use `npm run --silent eval -- --gateway --documents 5 --json > report.json`. A passage or answer that paraphrases an expected phrase can be flagged for review. A response that quotes a matching phrase still needs human review of claim support. The command exits nonzero if any case fails, needs review or was skipped.
 
 For the human review, score each response as supported, unsupported, or appropriately abstained. Verify that each material claim follows from the cited excerpt. Record ambiguous cases and do not count an ID match alone as groundedness. For quizzes, check that exactly one option is defensible and the explanation supports it. Record the model and prompt revision, sample size, pass counts, and any exclusions before reporting percentages.
 

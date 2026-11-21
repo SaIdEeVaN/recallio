@@ -66,6 +66,8 @@ on conflict(name) do update set value=excluded.value;
 
 Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, `npm audit --omit=dev --audit-level=high` and `npm run build`. Install Playwright Chromium with `npx playwright install chromium`, then run `npm run e2e`. An installed browser can be selected with `CHROMIUM_PATH`. Set `TEST_URL` to test an already running server.
 
+Run `npm run eval` for the full fixture benchmark. The [verification report](docs/verification.md#model-evaluation) documents the opt-in Gateway run and how to review its results.
+
 The private integration runner uses an isolated local Supabase stack and its captured test inbox. Allow the local app origin in Supabase, apply the migrations and configure the server secret. Run `node tests/mock-gateway.mjs`, set `RECALLIO_TEST_GATEWAY=http://127.0.0.1:3196/model` and a fixture-only `AI_GATEWAY_API_KEY` in your local development process, then start the app on port 3191. Run `npm run test:private` with `TEST_INBOX_URL` pointing to the local Mailpit HTTP origin. Production always uses Vercel AI Gateway.
 
 Commit and release from **main**. Select the Next.js preset on Vercel and configure production variables before building. Verify the production alias and commit SHA after deployment. To roll back, promote the previous known-good Vercel production deployment. Apply compatible forward migrations if a database correction is needed.
