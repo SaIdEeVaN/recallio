@@ -75,12 +75,21 @@ test("landing and sample workspace accessibility scan", async ({ page }) => {
   }
 });
 test("anonymous requests cannot access private study sets or generate tools", async ({
-  request,
+  page,
 }) => {
+  await page.goto("/");
   for (const action of ["open", "generate", "list", "delete"]) {
-    const r = await request.post("/api/study", {
-      data: { action, id: "9ac1031f-22b3-4b57-9630-d651af8f20b0" },
-    });
-    expect(r.status()).toBe(401);
+    const status = await page.evaluate(async (action) => {
+      const response = await fetch("/api/study", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          id: "9ac1031f-22b3-4b57-9630-d651af8f20b0",
+        }),
+      });
+      return response.status;
+    }, action);
+    expect(status).toBe(401);
   }
 });
