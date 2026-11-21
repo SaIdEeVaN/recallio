@@ -47,6 +47,7 @@ export default function Home() {
     [dark, K] = useState(false),
     [side, H] = useState(false),
     [notice, N] = useState(""),
+    [signInStatus, setSignInStatus] = useState(""),
     [query, Q] = useState(""),
     [target, G] = useState(null),
     [name, V] = useState(""),
@@ -61,6 +62,18 @@ export default function Home() {
       K(localStorage.getItem("recallio.theme") === "dark");
     } catch {}
     R(true);
+    const callbackFailed = [location.search, location.hash].some((part) => {
+      const params = new URLSearchParams(part.slice(1));
+      return (
+        params.has("error") &&
+        (params.has("error_code") || params.has("error_description"))
+      );
+    });
+    if (callbackFailed) {
+      history.replaceState(null, "", location.pathname);
+      setSignInStatus("Sign-in was canceled or expired. Please try again.");
+      M("signin");
+    }
     const client = supabase();
     if (!client) return;
     const {
@@ -72,8 +85,10 @@ export default function Home() {
         A(null);
         P("desk");
       }
-      if (event === "SIGNED_IN" && s)
+      if (event === "SIGNED_IN" && s) {
+        setSignInStatus("");
         M((current) => (current === "signin" ? "" : current));
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -533,7 +548,15 @@ export default function Home() {
           )}
         </main>
       </div>
-      {dialog === "signin" && <SignIn close={() => M("")} />}{" "}
+      {dialog === "signin" && (
+        <SignIn
+          initialStatus={signInStatus}
+          close={() => {
+            M("");
+            setSignInStatus("");
+          }}
+        />
+      )}{" "}
       {dialog === "new" && (
         <NewSet
           close={() => M("")}

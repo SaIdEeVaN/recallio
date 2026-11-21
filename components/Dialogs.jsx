@@ -1,15 +1,41 @@
 "use client";
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FileUp, Mail, FileText } from "lucide-react";
-import { supabase, request } from "../lib/client";
+import { googleSignInEnabled, supabase, request } from "../lib/client";
 import { Modal } from "./ui";
-export function SignIn({ close }) {
+export function SignIn({ close, initialStatus = "" }) {
   const [email, E] = useState(""),
-    [status, S] = useState(""),
-    [busy, B] = useState(false);
+    [status, S] = useState(initialStatus),
+    [busy, B] = useState(""),
+    [google, setGoogle] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    googleSignInEnabled(controller.signal)
+      .then((enabled) => {
+        if (!controller.signal.aborted) setGoogle(enabled);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+  async function continueWithGoogle() {
+    B("google");
+    S("");
+    try {
+      const client = supabase();
+      if (!client) throw new Error("Sign-in is unavailable.");
+      const { error } = await client.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: location.origin },
+      });
+      if (error) throw error;
+    } catch {
+      S("Could not start Google sign-in. Please try again.");
+      B("");
+    }
+  }
   async function submit(e) {
     e.preventDefault();
-    B(true);
+    B("email");
     S("");
     try {
       const client = supabase();
@@ -23,7 +49,7 @@ export function SignIn({ close }) {
     } catch (e) {
       S(e.message);
     } finally {
-      B(false);
+      B("");
     }
   }
   return (
@@ -32,6 +58,22 @@ export function SignIn({ close }) {
         Save your own sources, generate study tools, and return to your progress
         on any device.
       </p>
+      {google && (
+        <>
+          <button
+            type="button"
+            className="outline googleSignIn"
+            onClick={continueWithGoogle}
+            disabled={Boolean(busy)}
+          >
+            <img src="/google-icon.svg" alt="" width="18" height="18" />
+            {busy === "google" ? "Opening Google…" : "Continue with Google"}
+          </button>
+          <div className="signInDivider" aria-hidden="true">
+            or
+          </div>
+        </>
+      )}
       <form onSubmit={submit}>
         <label>
           Email address
@@ -44,9 +86,9 @@ export function SignIn({ close }) {
             onChange={(e) => E(e.target.value)}
           />
         </label>
-        <button className="primary" disabled={busy}>
+        <button className="primary" disabled={Boolean(busy)}>
           <Mail size={17} />
-          {busy ? "Sending…" : "Email me a sign-in link"}
+          {busy === "email" ? "Sending…" : "Email me a sign-in link"}
         </button>
       </form>
       <p className="notice" role="status">

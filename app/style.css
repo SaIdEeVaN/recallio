@@ -1118,3 +1118,22 @@ textarea {
     transition: none !important;
   }
 }
+
+.googleSignIn {
+  width: 100%;
+}
+.signInDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.signInDivider::before,
+.signInDivider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}

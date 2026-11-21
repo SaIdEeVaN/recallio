@@ -11,7 +11,7 @@ Recallio turns one source into a private study set. Read a cited summary, review
 1. Choose **Explore sample**. Open a citation in the summary to jump to the original passage.
 2. Flip a flashcard and choose **Review again**. The card appears in the review queue.
 3. Take a quiz, submit your answers, and retry missed questions. Unanswered questions appear separately. Accuracy uses the number answered.
-4. Sign in by email to save your own sources. Choose **New study set**, paste notes or upload a text-based PDF or TXT, review the extraction, then choose **Generate tools**.
+4. Sign in by email or with Google, when enabled, to save your own sources. Choose **New study set**, paste notes or upload a text-based PDF or TXT, review the extraction, then choose **Generate tools**.
 
 Sample practice stays in the browser. Private sets and completed attempts persist in Supabase. The sample tutor has three curated answers. The private tutor calls a configurable model through Vercel AI Gateway.
 
@@ -61,6 +61,18 @@ on conflict(name) do update set value=excluded.value;
 | RECALLIO_MODEL | Gateway model ID |
 | RECALLIO_AI_ENABLED | Set to `false` to pause generation and tutoring |
 | RECALLIO_UPLOAD_ENABLED | Set to `false` to pause file upload reservations |
+
+## Google sign-in
+
+Recallio reads the Supabase provider settings when the sign-in dialog opens. The Google button appears as soon as Google is enabled for the project. OAuth configuration lives in Google Auth Platform and Supabase.
+
+1. Set the Supabase **Authentication → URL Configuration → Site URL** to `https://recallio-saideevans-projects.vercel.app`. Add exact development origins to the redirect allow list as needed.
+2. In [Google Auth Platform](https://console.cloud.google.com/auth/overview), configure the consent screen and its audience. An external app in Testing mode only supports its configured test users. Use the standard OpenID, email and profile scopes.
+3. Create a **Web application** OAuth client. Set its authorized JavaScript origin to `https://recallio-saideevans-projects.vercel.app` and its authorized redirect URI to `https://mnrnauoxiuycmvxwzzte.supabase.co/auth/v1/callback`. For your own copy of Recallio, use your application origin and the callback URI displayed in the Google provider settings of your Supabase project.
+4. Enter the Google Client ID and Client Secret in the [Supabase Google provider settings](https://supabase.com/dashboard/project/mnrnauoxiuycmvxwzzte/auth/providers?provider=Google), then enable and save the provider. Keep the Client Secret in Supabase.
+5. Open Recallio, choose **Continue with Google**, then verify you can open **Account** and save a study set.
+
+[Supabase’s Google sign-in guide](https://supabase.com/docs/guides/auth/social-login/auth-google)
 
 ## Verification and releases
 
