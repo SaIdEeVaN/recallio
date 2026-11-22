@@ -1,7 +1,39 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { X, FileText } from "lucide-react";
-export const modes = ["Summary", "Flashcards", "Quiz", "Tutor"];
+import {
+  X,
+  BookOpen,
+  Layers,
+  ClipboardList,
+  Sparkles,
+  FileText,
+} from "lucide-react";
+export const modes = [
+  {
+    name: "Summary",
+    icon: BookOpen,
+    color: "sage",
+    description: "Find the big ideas and key terms.",
+  },
+  {
+    name: "Flashcards",
+    icon: Layers,
+    color: "lilac",
+    description: "Practice one recall prompt at a time.",
+  },
+  {
+    name: "Quiz",
+    icon: ClipboardList,
+    color: "peach",
+    description: "Test what you know and review mistakes.",
+  },
+  {
+    name: "Tutor",
+    icon: Sparkles,
+    color: "blue",
+    description: "Ask a question and follow the evidence.",
+  },
+];
 export function Badge({ children }) {
   return <span className="badge">{children}</span>;
 }

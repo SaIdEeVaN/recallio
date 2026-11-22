@@ -9,10 +9,9 @@ Recallio turns one source into a private study set. Read a cited summary, review
 ## Try it
 
 1. Choose **Explore sample**. Open a citation in the summary to jump to the original passage.
-2. Reveal a flashcard answer and open its **Source excerpt** to check the citation. Choose **Review again** to add the card to your review queue.
+2. Flip a flashcard and choose **Review again**. The card appears in the review queue.
 3. Take a quiz, submit your answers, and retry missed questions. Unanswered questions appear separately. Accuracy uses the number answered.
-4. Sign in with Google or an email link. Choose **New study set**, paste notes or upload a text-based PDF or TXT, then select **Generate tools**.
-5. Open a study tab, return to the desk, and reload. **Resume study set** opens the last visited tab in this browser.
+4. Sign in by email or with Google, when enabled, to save your own sources. Choose **New study set**, paste notes or upload a text-based PDF or TXT, review the extraction, then choose **Generate tools**.
 
 Sample practice stays in the browser. Private sets and completed attempts persist in Supabase. The sample tutor has three curated answers. The private tutor calls a configurable model through Vercel AI Gateway.
 

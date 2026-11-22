@@ -78,21 +78,6 @@ try {
   await p.reload();
   await expect(p.getByRole("heading", { name: "QA botany" })).toBeVisible();
   console.log("PASS reopen after refresh");
-  await p.getByRole("button", { name: "Flashcards", exact: true }).click();
-  await p
-    .getByRole("navigation", { name: "Workspace", exact: true })
-    .getByRole("button", { name: "Study desk", exact: true })
-    .click();
-  await p.reload();
-  await p
-    .getByRole("button", { name: "Resume study set", exact: true })
-    .click();
-  await expect(
-    p.getByRole("button", { name: "Flashcards", exact: true }),
-  ).toHaveAttribute("aria-current", "page");
-  console.log(
-    "PASS study desk resumes the last private study mode after reload",
-  );
   const other = await b.newPage();
   await login(other, "other-" + Date.now() + "@example.test");
   await other.goto(site + "/#set/" + setId + "/Source");

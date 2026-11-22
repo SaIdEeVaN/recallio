@@ -3,16 +3,22 @@ import { useState, useRef, useEffect } from "react";
 import {
   FileText,
   BookOpen,
+  Layers,
+  ClipboardList,
   Sparkles,
+  Settings2,
   Pencil,
   Check,
   RotateCcw,
   Shuffle,
+  ChevronLeft,
+  ChevronRight,
   Lightbulb,
   Trash2,
   Plus,
   Send,
   Square,
+  Leaf,
 } from "lucide-react";
 import { sample } from "../lib/sample.mjs";
 import { request, supabase } from "../lib/client";
@@ -98,10 +104,16 @@ export default function Workspace({
   return (
     <>
       <div className="workIntro">
+        <div className="eyebrow">
+          <span className="dash" />
+          {isDemo ? "Sample study set" : "Private study set"}
+        </div>
         <h1>{item.title}</h1>
         <div className="workMeta">
-          <span>{isDemo ? item.subject : item.format}</span>
-          <span aria-hidden="true">·</span>
+          <span>
+            <FileText size={15} />
+            {item.format}
+          </span>
           <span>{item.chunks?.length || 0} source sections</span>
           {item.words && <span>{item.words.toLocaleString()} words</span>}
           {item.format === "PDF" && (
@@ -117,21 +129,24 @@ export default function Workspace({
           )}
         </div>
       </div>
-      <nav className="tabs" aria-label="Study modes">
-        {["Source", ...modes].map((name) => (
-          <button
-            key={name}
-            aria-current={name === displayTab ? "page" : undefined}
-            onClick={() => {
-              setTab(name);
-              Q("");
-            }}
-            className={name === displayTab ? "on" : ""}
-          >
-            {name}
-          </button>
-        ))}
-      </nav>
+      <div className="tabs" aria-label="Study modes">
+        {[{ name: "Source", icon: FileText }, ...modes].map(
+          ({ name, icon: I }) => (
+            <button
+              key={name}
+              aria-current={name === displayTab ? "page" : undefined}
+              onClick={() => {
+                setTab(name);
+                Q("");
+              }}
+              className={name === displayTab ? "on" : ""}
+            >
+              <I size={16} />
+              {name}
+            </button>
+          ),
+        )}
+      </div>
       {feedback && dialog !== "generate" && (
         <p className="notice" role="alert">
           {feedback}
@@ -399,115 +414,18 @@ function Cards({ item, initialFilter, update, action, cite, gen, notify }) {
     O(a);
     go(0);
   }
-  const sources = (card?.refs || [])
-    .map((id) => item.chunks.find((chunk) => chunk.id === id))
-    .filter(Boolean);
   return (
-    <section className="flashcards" aria-label="Flashcard practice">
-      {card ? (
-        <div className="flashcardLayout">
-          <div className="flashcardPractice">
-            <div className="cardMeta" aria-live="polite">
-              <span>
-                Card {pos + 1} of {list.length}
-              </span>
-              <span>
-                {card.status === "known"
-                  ? "Known"
-                  : card.status === "review"
-                    ? "Needs review"
-                    : "New card"}
-              </span>
-            </div>
-            <button
-              className="flipCard"
-              aria-describedby={
-                flipped
-                  ? "current-card-text current-card-answer"
-                  : "current-card-text"
-              }
-              onClick={() => F(!flipped)}
-              aria-label={flipped ? "Show question" : "Reveal answer"}
-            >
-              <span>Question</span>
-              <strong id="current-card-text">{card.front}</strong>
-              {flipped ? (
-                <span className="cardAnswer" id="current-card-answer">
-                  <span>Answer</span>
-                  {card.back}
-                </span>
-              ) : (
-                <span className="cardPrompt">Reveal answer</span>
-              )}
-            </button>
-            <div className="cardActions">
-              <div className="actions">
-                <button
-                  disabled={busy}
-                  className="outline"
-                  onClick={() => mutate("review")}
-                >
-                  Review again
-                </button>
-                <button
-                  disabled={busy}
-                  className="primary"
-                  onClick={() => mutate("known")}
-                >
-                  Know it
-                </button>
-              </div>
-              <div className="actions">
-                <button
-                  aria-label="Previous card"
-                  className="outline"
-                  onClick={() => go(pos - 1)}
-                >
-                  Previous
-                </button>
-                <button className="outline" onClick={() => go(pos + 1)}>
-                  Next card
-                </button>
-              </div>
-            </div>
-            {hint && (
-              <p className="notice">
-                {card.hint || "Reveal the answer for its source excerpt."}
-              </p>
-            )}
-          </div>
-          {flipped && sources.length > 0 && (
-            <aside className="flashcardSource" aria-label="Source excerpt">
-              <h3>
-                <BookOpen size={18} aria-hidden="true" /> Source{" "}
-                {sources.length === 1 ? "excerpt" : "excerpts"}
-              </h3>
-              {sources.map((source) => (
-                <div key={source.id} className="flashcardPassage">
-                  <h4>
-                    {source.id} · {source.title}
-                  </h4>
-                  <p>{source.text}</p>
-                  <button
-                    className="textLink"
-                    onClick={() => cite(source.id)}
-                    aria-label={
-                      sources.length > 1
-                        ? "Open source section " + source.id
-                        : undefined
-                    }
-                  >
-                    Open source section
-                  </button>
-                </div>
-              ))}
-            </aside>
-          )}
-        </div>
-      ) : (
-        <p>No cards currently need review.</p>
-      )}
-      <div className="toolbar flashcardTools">
+    <section className="panel">
+      <div className="sectionHead">
+        <h2>Flashcards</h2>
+        {!demo && (
+          <button className="quiet" onClick={gen}>
+            <RotateCcw size={15} />
+            Regenerate
+          </button>
+        )}
+      </div>
+      <div className="toolbar">
         <label className="check">
           <input
             type="checkbox"
@@ -519,42 +437,105 @@ function Cards({ item, initialFilter, update, action, cite, gen, notify }) {
           />
           Review again only
         </label>
-        <div className="actions">
-          {card && (
-            <>
-              <button className="quiet" onClick={() => J(!hint)}>
-                <Lightbulb size={15} />
-                {hint ? "Hide hint" : "Hint"}
+        <button className="quiet" onClick={shuffle}>
+          <Shuffle size={15} />
+          Shuffle
+        </button>
+      </div>
+      {card ? (
+        <>
+          <div className="cardMeta">
+            <span>
+              Card {pos + 1} of {list.length}
+            </span>
+            <span>
+              {card.status === "known"
+                ? "Known"
+                : card.status === "review"
+                  ? "Needs review"
+                  : "New card"}
+            </span>
+          </div>
+          <button
+            className="flipCard"
+            aria-describedby="current-card-text"
+            onClick={() => F(!flipped)}
+            aria-label={flipped ? "Show question" : "Reveal answer"}
+          >
+            <span>{flipped ? "Answer" : "Recall prompt"}</span>
+            <strong id="current-card-text">
+              {flipped ? card.back : card.front}
+            </strong>
+            <small>
+              <RotateCcw size={14} />{" "}
+              {flipped ? "Show question" : "Flip to reveal"}
+            </small>
+          </button>
+          {flipped && <Citations refs={card.refs} cite={cite} />}
+          <div className="actions spread">
+            <button
+              aria-label="Previous card"
+              className="square"
+              onClick={() => go(pos - 1)}
+            >
+              <ChevronLeft />
+            </button>
+            <div className="actions">
+              <button
+                disabled={busy}
+                className="outline"
+                onClick={() => mutate("review")}
+              >
+                <RotateCcw size={16} />
+                Review again
               </button>
               <button
-                className="quiet"
-                onClick={() => {
-                  U(card.front);
-                  V(card.back);
-                  M("edit");
-                }}
+                disabled={busy}
+                className="primary"
+                onClick={() => mutate("known")}
               >
-                <Pencil size={15} />
-                Edit
+                <Check size={16} />
+                Know it
               </button>
-              <button className="quiet" onClick={() => M("delete")}>
-                <Trash2 size={15} />
-                Delete
-              </button>
-              <button className="quiet" onClick={shuffle}>
-                <Shuffle size={15} />
-                Shuffle
-              </button>
-            </>
-          )}
-          {!demo && (
-            <button className="quiet" onClick={gen}>
-              <RotateCcw size={15} />
-              Regenerate
+            </div>
+            <button
+              aria-label="Next card"
+              className="square"
+              onClick={() => go(pos + 1)}
+            >
+              <ChevronRight />
             </button>
+          </div>
+          <div className="actions">
+            <button className="quiet" onClick={() => J(!hint)}>
+              <Lightbulb size={15} />
+              {hint ? "Hide hint" : "Hint"}
+            </button>
+            <button
+              className="quiet"
+              onClick={() => {
+                U(card.front);
+                V(card.back);
+                M("edit");
+              }}
+            >
+              <Pencil size={15} />
+              Edit
+            </button>
+            <button className="quiet" onClick={() => M("delete")}>
+              <Trash2 size={15} />
+              Delete
+            </button>
+          </div>
+          {hint && (
+            <p className="notice">
+              {card.hint || "Open the source citation for a clue."}
+            </p>
           )}
-        </div>
-      </div>
+        </>
+      ) : (
+        <p>No cards currently need review.</p>
+      )}
       {modal === "edit" && (
         <Modal title="Edit flashcard" onClose={() => M("")}>
           <form
