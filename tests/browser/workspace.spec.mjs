@@ -8,10 +8,18 @@ test("sample supports cited reading, edited cards, persistent review and server-
   await page.getByRole("button", { name: "S2", exact: true }).first().click();
   await expect(page.locator("#src-S2")).toBeFocused();
   await page.getByRole("button", { name: "Flashcards", exact: true }).click();
+  await expect(
+    page.getByRole("complementary", { name: "Source excerpt" }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: "Reveal answer" }).click();
+  const excerpt = page.getByRole("complementary", { name: "Source excerpt" });
+  await expect(excerpt).toContainText("From light to chemical energy");
   await expect(
     page.getByRole("button", { name: "Show question" }),
   ).toContainText("chloroplasts");
+  await excerpt.getByRole("button", { name: "Open source section" }).click();
+  await expect(page.locator("#src-S1")).toBeFocused();
+  await page.getByRole("button", { name: "Flashcards", exact: true }).click();
   await page.getByRole("button", { name: "Review again", exact: true }).click();
   await page.getByRole("button", { name: "Edit", exact: true }).click();
   await page
@@ -49,14 +57,19 @@ test("360px mobile navigation, dark theme and sign-in dialog work with keyboard"
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Your study desk." }),
+    page.getByRole("heading", { name: "Study desk", exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(360);
   await page.getByRole("button", { name: "Open navigation" }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page.getByRole("button", { name: "Dark theme" }).click();
-  await page.getByRole("button", { name: "My library" }).click();
+  await page.getByRole("button", { name: "Close" }).click();
+  await page
+    .getByRole("navigation", { name: "Mobile workspace" })
+    .getByRole("button", { name: "My library" })
+    .click();
   await page.getByRole("button", { name: "New study set" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");

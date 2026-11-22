@@ -1,21 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
-  LayoutGrid,
-  LibraryBig,
   Bookmark,
   Sun,
   Moon,
   LogIn,
-  Compass,
   Plus,
-  Leaf,
   BookOpen,
-  Layers,
+  FileText,
+  ChevronRight,
   Menu,
   X,
-  PanelLeft,
-  Activity,
   Settings,
   LogOut,
   Trash2,
@@ -28,10 +23,11 @@ import { request, supabase } from "../lib/client";
 import { modes, Modal } from "../components/ui";
 import { SignIn, NewSet, Privacy } from "../components/Dialogs";
 import Workspace from "../components/Workspace";
+const studyModes = ["Source", ...modes, "Review"];
 const navItems = [
-  ["desk", "Study desk", LayoutGrid],
-  ["library", "My library", LibraryBig],
-  ["review", "Review queue", Bookmark],
+  ["desk", "Study desk"],
+  ["library", "My library"],
+  ["review", "Review queue"],
 ];
 function blankSample() {
   return structuredClone(sample);
@@ -43,6 +39,7 @@ export default function Home() {
     [demo, D] = useState(blankSample),
     [session, S] = useState(null),
     [library, L] = useState([]),
+    [lastStudy, rememberStudy] = useState(null),
     [dialog, M] = useState(""),
     [dark, K] = useState(false),
     [side, H] = useState(false),
@@ -128,16 +125,12 @@ export default function Home() {
     if (parts[0] === "set" && parts[1]) {
       if (parts[1] === "sample") {
         A(null);
-        T(
-          ["Source", ...modes.map((m) => m.name)].includes(parts[2])
-            ? parts[2]
-            : "Summary",
-        );
+        T(studyModes.includes(parts[2]) ? parts[2] : "Summary");
         P("set");
       } else if (session) {
         try {
           A(await request("open", { id: parts[1] }));
-          T(parts[2] || "Source");
+          T(studyModes.includes(parts[2]) ? parts[2] : "Source");
           P("set");
         } catch (e) {
           N(e.message);
@@ -152,6 +145,25 @@ export default function Home() {
     window.addEventListener("hashchange", f);
     return () => window.removeEventListener("hashchange", f);
   }, [session?.user.id]);
+  const userId = session?.user.id;
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("recallio.resume." + userId),
+      );
+      if (saved && studyModes.includes(saved.tab))
+        rememberStudy({ ...saved, userId });
+    } catch {}
+  }, [userId]);
+  useEffect(() => {
+    if (!userId || page !== "set" || !set?.id) return;
+    const next = { id: set.id, tab };
+    rememberStudy({ ...next, userId });
+    try {
+      localStorage.setItem("recallio.resume." + userId, JSON.stringify(next));
+    } catch {}
+  }, [userId, page, set?.id, tab]);
   function openStudy(item, mode = "Source") {
     A(item.id === "sample" ? null : item);
     P("set");
@@ -188,10 +200,24 @@ export default function Home() {
   const demoReview = demo.cards.filter((c) => c.status === "review").length;
   const reviewCount = library.reduce((n, s) => n + s.needsReview, demoReview);
   const attempts = [...library.flatMap((s) => s.attempts), ...demo.attempts];
+  const rememberedSet =
+    lastStudy?.userId === userId
+      ? library.find(
+          (item) => item.id === lastStudy?.id && item.status === "ready",
+        )
+      : null;
+  const resumeSet =
+    rememberedSet || library.find((item) => item.status === "ready");
+  const reviewSets =
+    library.filter((item) => item.needsReview > 0).length +
+    Number(demoReview > 0);
+  const activeNav = page === "set" ? (set ? "library" : "desk") : page;
   const deskTitle =
     page === "set"
-      ? "Study workspace"
-      : navItems.find((x) => x[0] === page)?.[1] || "Study desk";
+      ? "My library / Study set"
+      : page === "desk"
+        ? "My workspace"
+        : navItems.find(([id]) => id === page)?.[1];
   function libRow(s) {
     return (
       <article className="librow" key={s.id}>
@@ -242,6 +268,32 @@ export default function Home() {
       </article>
     );
   }
+  function navigation(mobile = false) {
+    return (
+      <nav
+        className={mobile ? "bottomNav" : "sideNav"}
+        aria-label={mobile ? "Mobile workspace" : "Workspace"}
+        hidden={mobile && side}
+      >
+        {navItems.map(([id, label]) => (
+          <button
+            key={id}
+            className={"navitem " + (activeNav === id ? "selected" : "")}
+            aria-current={activeNav === id ? "page" : undefined}
+            onClick={() => {
+              pageTo(id);
+              refresh();
+            }}
+          >
+            {label}
+            {!mobile && id === "review" && reviewCount > 0 && (
+              <span className="counter">{reviewCount}</span>
+            )}
+          </button>
+        ))}
+      </nav>
+    );
+  }
   return (
     <div className="shell">
       <a className="skip" href="#main">
@@ -259,183 +311,184 @@ export default function Home() {
           <img alt="" src="/icon.svg" />
           Recallio
         </button>
-        <small className="navlabel">Workspace</small>
-        <nav>
-          {navItems.map(([id, label, I]) => (
-            <button
-              key={id}
-              className={"navitem " + (page === id ? "selected" : "")}
-              onClick={() => {
-                pageTo(id);
-                refresh();
-              }}
-            >
-              <I size={18} />
-              {label}
-              {id === "review" && reviewCount > 0 && (
-                <span className="counter">{reviewCount}</span>
-              )}
-            </button>
-          ))}
-        </nav>
+        {navigation()}
         <div className="sidebarFoot">
-          <button className="navitem" onClick={() => K(!dark)}>
-            {dark ? <Sun size={18} /> : <Moon size={18} />}{" "}
-            {dark ? "Light theme" : "Dark theme"}
+          <button
+            className="navitem"
+            onClick={() => {
+              H(false);
+              M("settings");
+            }}
+          >
+            <Settings size={18} aria-hidden="true" /> Settings
           </button>
-          <button className="navitem" onClick={() => M("privacy")}>
-            <ShieldCheck size={18} />
-            Privacy & usage
-          </button>
-          <div className="account">
-            <div className="avatar">
-              {session ? (
-                (session.user.email?.[0] || "U").toUpperCase()
-              ) : (
-                <Compass size={20} />
-              )}
-            </div>
-            <div className="grow">
-              <strong>{session ? "My account" : "Guest workspace"}</strong>
-              <small>{session ? "Signed in" : "Exploring the sample"}</small>
-            </div>
-            <button
-              className="square"
-              aria-label={session ? "Account settings" : "Sign in"}
-              onClick={() => M(session ? "account" : "signin")}
-            >
-              {session ? <Settings size={17} /> : <LogIn size={17} />}
-            </button>
-          </div>
         </div>
       </aside>
       <div className="area">
         <header>
-          <div className="crumb">
+          <span className="crumb desktop">{deskTitle}</span>
+          <button className="brand mobile" onClick={() => pageTo("desk")}>
+            <img alt="" src="/icon.svg" /> Recallio
+          </button>
+          <div className="headerActions">
+            <button
+              className="quiet"
+              aria-label={session ? "Account" : "Sign in"}
+              onClick={() => M(session ? "account" : "signin")}
+            >
+              {session ? (
+                <span className="avatar" aria-hidden="true">
+                  {(session.user.email?.[0] || "U").toUpperCase()}
+                </span>
+              ) : (
+                <LogIn size={16} aria-hidden="true" />
+              )}
+              <span className={session ? "desktop" : undefined}>
+                {session ? "Account" : "Sign in"}
+              </span>
+            </button>
             <button
               className="mobile square"
               aria-label="Open navigation"
+              aria-expanded={side}
               onClick={() => H(true)}
             >
-              <Menu />
+              <Menu size={19} />
             </button>
-            <PanelLeft className="desktop" size={16} />
-            <span className="desktop">Workspace</span>
-            <b className="desktop">/</b>
-            <strong>{deskTitle}</strong>
-          </div>
-          <div>
-            {session ? (
-              <button className="quiet" onClick={() => M("account")}>
-                <Settings size={16} />
-                Account
-              </button>
-            ) : (
-              <button className="quiet" onClick={() => M("signin")}>
-                <LogIn size={16} />
-                Sign in
-              </button>
-            )}
           </div>
         </header>
         <main id="main">
           {page === "desk" ? (
-            <>
-              <div className="pageIntro">
-                <div>
-                  <h1>
-                    Your study desk<span>.</span>
-                  </h1>
-                  <p>
-                    Turn your notes into understanding, one study set at a time.
-                  </p>
-                </div>
+            <div className="studyDesk">
+              <div className="deskHeading">
+                <h1>Study desk</h1>
                 <button className="primary" onClick={newSet}>
-                  <Plus size={17} />
-                  New study set
+                  <Plus size={16} aria-hidden="true" />
+                  <span>New study set</span>
                 </button>
               </div>
-              <section className="hero">
-                <div
-                  className="heroArt"
-                  role="img"
-                  aria-label="Engraved botanical illustration of fern fronds growing from an open field notebook"
-                />
-                <div className="heroText">
-                  <div className="heroLabel">
-                    <span className="tinyDot" />
-                    Featured study set
-                  </div>
-                  <h2>
-                    The science of
-                    <br />
-                    <em>photosynthesis</em>
-                  </h2>
-                  <div className="heroMeta">
-                    <span>
-                      <Leaf size={15} />
-                      Biology
-                    </span>
-                    <i />
-                    <span>5 source sections</span>
+              <div className="deskPanels">
+                <section className="resumeSet" aria-labelledby="resume-heading">
+                  <p className="deskLabel" id="resume-heading">
+                    {resumeSet ? "Continue studying" : "Sample study set"}
+                  </p>
+                  <h2>{resumeSet?.title || demo.title}</h2>
+                  <p>
+                    {resumeSet
+                      ? resumeSet.format + " · Saved study set"
+                      : demo.subject +
+                        " · " +
+                        demo.chunks.length +
+                        " source sections"}
+                  </p>
+                  <button
+                    className="primary"
+                    onClick={() =>
+                      resumeSet
+                        ? openPrivate(
+                            resumeSet.id,
+                            rememberedSet ? lastStudy.tab : "Source",
+                          )
+                        : openStudy(demo, "Summary")
+                    }
+                  >
+                    {resumeSet ? "Resume study set" : "Explore sample"}
+                  </button>
+                </section>
+                <section
+                  className="deskReview"
+                  aria-labelledby="review-heading"
+                >
+                  <div>
+                    <h2 className="deskLabel" id="review-heading">
+                      Review queue
+                    </h2>
+                    <p className="reviewTotal">
+                      <strong>{reviewCount}</strong>
+                      <span>
+                        {reviewCount === 1 ? "card" : "cards"} to review
+                        {reviewSets > 1
+                          ? " across " + reviewSets + " sets"
+                          : ""}
+                      </span>
+                    </p>
                   </div>
                   <button
-                    className="paperButton"
-                    onClick={() => openStudy(demo, "Summary")}
+                    className="outline"
+                    aria-label="Open review queue"
+                    onClick={() => pageTo("review")}
                   >
-                    <BookOpen size={17} />
-                    Explore sample
+                    <span className="desktop">Open review queue</span>
+                    <span className="mobile">Review</span>
+                  </button>
+                </section>
+              </div>
+              <section aria-labelledby="library-heading">
+                <div className="deskLibraryHeading">
+                  <h2 id="library-heading">My library</h2>
+                  <button
+                    className="textLink"
+                    onClick={() => pageTo("library")}
+                  >
+                    View all study sets
                   </button>
                 </div>
+                {library.length > 0 ? (
+                  <ul className="deskLibrary">
+                    {library.slice(0, 3).map((studySet) => (
+                      <li key={studySet.id}>
+                        <button
+                          aria-label={studySet.title}
+                          onClick={() => openPrivate(studySet.id)}
+                        >
+                          <span className="deskFileIcon">
+                            <FileText size={18} aria-hidden="true" />
+                          </span>
+                          <span className="grow">
+                            <strong>{studySet.title}</strong>
+                            <small>
+                              {studySet.format} ·{" "}
+                              {studySet.status !== "ready"
+                                ? studySet.status
+                                : studySet.needsReview > 0
+                                  ? studySet.needsReview +
+                                    (studySet.needsReview === 1
+                                      ? " card to review"
+                                      : " cards to review")
+                                  : "Ready to study"}
+                            </small>
+                          </span>
+                          <ChevronRight size={18} aria-hidden="true" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="deskLibraryEmpty">
+                    {session
+                      ? "Your saved study sets will appear here."
+                      : "Sign in to save and review your own study sets."}
+                  </p>
+                )}
               </section>
-              <section className="block">
-                <div className="sectionHead">
-                  <h2>Study tools</h2>
-                  <span>Try with the sample</span>
-                </div>
-                <div className="toolGrid">
-                  {modes.map(({ name, description, color, icon: I }) => (
-                    <button
-                      key={name}
-                      className={"tool " + color}
-                      onClick={() => openStudy(demo, name)}
-                    >
-                      <span className={"tileIcon " + color}>
-                        <I size={23} strokeWidth={1.7} />
-                      </span>
-                      <h3>{name === "Tutor" ? "Ask tutor" : name}</h3>
-                      <p>{description}</p>
-                    </button>
-                  ))}
-                </div>
-              </section>
-              <section className="block">
-                <div className="sectionHead">
-                  <h2>Practice overview</h2>
-                  <span>{session ? "All study sets" : "Sample activity"}</span>
-                </div>
-                <div className="metrics">
-                  <div>
-                    <Layers />
-                    <b>{reviewCount}</b>
-                    <span>Cards to review</span>
-                  </div>
-                  <div>
-                    <Activity />
-                    <b>{attempts.length}</b>
-                    <span>Quiz attempts</span>
-                  </div>
-                  <div>
-                    <Bookmark />
-                    <b>
-                      {attempts.reduce((n, a) => n + a.correct, 0)} /{" "}
-                      {attempts.reduce((n, a) => n + a.answered, 0)}
-                    </b>
-                    <span>Correct / answered</span>
-                  </div>
-                </div>
-              </section>
-            </>
+              {resumeSet && (
+                <button
+                  className="textLink deskSample"
+                  onClick={() => openStudy(demo, "Summary")}
+                >
+                  <BookOpen size={18} aria-hidden="true" /> Explore the sample
+                  study set
+                </button>
+              )}
+              {attempts.length > 0 && (
+                <p className="deskActivity">
+                  {attempts.length} quiz{" "}
+                  {attempts.length === 1 ? "attempt" : "attempts"} ·{" "}
+                  {attempts.reduce((n, a) => n + a.correct, 0)} /{" "}
+                  {attempts.reduce((n, a) => n + a.answered, 0)} correct
+                </p>
+              )}
+            </div>
           ) : page === "set" ? (
             <Workspace
               key={current.id}
@@ -548,6 +601,7 @@ export default function Home() {
           )}
         </main>
       </div>
+      {navigation(true)}
       {dialog === "signin" && (
         <SignIn
           initialStatus={signInStatus}
@@ -566,6 +620,19 @@ export default function Home() {
             refresh();
           }}
         />
+      )}
+      {dialog === "settings" && (
+        <Modal title="Settings" onClose={() => M("")}>
+          <div className="settingsActions">
+            <button className="outline" onClick={() => K(!dark)}>
+              {dark ? <Sun size={18} /> : <Moon size={18} />}
+              {dark ? "Light theme" : "Dark theme"}
+            </button>
+            <button className="outline" onClick={() => M("privacy")}>
+              <ShieldCheck size={18} /> Privacy & usage
+            </button>
+          </div>
+        </Modal>
       )}
       {dialog === "privacy" && <Privacy close={() => M("")} />}
       {dialog === "account" && (
