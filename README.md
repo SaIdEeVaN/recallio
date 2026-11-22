@@ -2,7 +2,7 @@
 
 Recallio turns one source into a private study set. Read a cited summary, review flashcards, take a server-graded quiz, or ask questions that link back to supporting passages.
 
-**[Open Recallio](https://recallio-sai.vercel.app)** · **[Verification report](docs/verification.md)**
+**[Open Recallio](https://recallio-sai.vercel.app)** · **[Release checklist](docs/release-checklist.md)** · **[Verification report](docs/verification.md)**
 
 ![Recallio study desk with the interactive photosynthesis sample](docs/study-desk.webp)
 
@@ -77,7 +77,7 @@ Recallio reads the Supabase provider settings when the sign-in dialog opens. The
 
 ## Verification and releases
 
-Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, `npm audit --omit=dev --audit-level=high` and `npm run build`. Install Playwright Chromium with `npx playwright install chromium`, then run `npm run e2e`. An installed browser can be selected with `CHROMIUM_PATH`. Set `TEST_URL` to test an already running server.
+Run `npm run verify` for formatting, linting, type checking, unit tests, the fixture benchmark, the production dependency audit, and the production build. The browser checks and hosted account, model, and upload steps are in the [release checklist](docs/release-checklist.md).
 
 Run `npm run eval` for the full fixture benchmark. The [verification report](docs/verification.md#model-evaluation) documents the opt-in Gateway run and how to review its results.
 
